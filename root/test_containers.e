@@ -16,10 +16,8 @@ feature -- Adding test classes.
 
 	make
 			-- Run application.
-		local
-			ac: ARRAYED_CONTAINER
 		do
-			add_test (create {TEST_ARRAY_COPIES}.make)
+			add_test (create {LL_TEST}.make)
 
 			show_browser
 			run_espec

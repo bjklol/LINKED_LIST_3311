@@ -52,13 +52,22 @@ feature -- Commands
 	insert_at (i: INTEGER; s: STRING)
 			-- Insert value 's' into index 'i'.
 		require
-			valid_index: True -- Your task
+			valid_index: valid_index(i)
 		do
-			-- Your task
+--			imp.go_i_th (i)
+--			imp.put_left(s)
+--			imp.put_i_th (s, i)
+			imp.go_i_th (i-1)
+			imp.put_right (s)
 		ensure
-			size_changed: True -- Your task
-			inserted_at_i: True -- Your task
-			left_half_the_same: True -- Your task
+			size_changed: imp.count=(old imp.twin).count+1
+			inserted_at_i: imp[i]~s
+			left_half_the_same:
+			across
+				1 |..| (i-1) as j
+			all
+				imp[j.item] ~ (old imp.twin)[j.item]
+			end
 			right_half_the_same: True -- Your task
 		end
 
@@ -77,22 +86,32 @@ feature -- Commands
 	insert_last (s: STRING)
 			-- Insert 's' as the last element of the container.
 		do
-			-- Your task
+			imp.extend (s)
 		ensure
-			size_changed: True -- Your task
-			last_inserted: True -- Your task
-			others_unchanged: True -- Your task
+			size_changed:imp.count=(old imp.twin).count+1
+			last_inserted: imp[imp.count]~s
+			others_unchanged:
+			across
+				1 |..| (imp.count-1) as j
+			all
+				imp[j.item]~(old imp.twin)[j.item]
+			end
 		end
 
 	remove_first
 			-- Remove first element from the container.
 		require
-			not_empty: True -- Your task
+			not_empty:count>0
 		do
-			-- Your task
+			imp.start
+			imp.remove
 		ensure
-			size_changed: True -- Your task
-			others_unchanged: True -- Your task
+			size_changed: imp.count = (old imp.twin).count-1
+			others_unchanged: across
+				1 |..| imp.count as n
+			all
+				imp[n.item]~(old imp.twin)[n.item]
+			end
 		end
 
 feature -- Queries
@@ -111,9 +130,15 @@ feature -- Queries
 		do
 			Result:= i <= imp.count and i >= 1
 		ensure
-			size_unchanged: True -- Your task
-			result_correct: True -- Your task
-			no_elements_changed: True -- Your task
+			size_unchanged: imp.count =(old imp.twin).count
+			result_correct: Result= (i <= imp.count) and (i >= 1)
+			no_elements_changed:
+			across
+				1 |..| (old imp.twin).count as j
+			all
+				imp[j.item] ~ (old imp.twin)[j.item]
+			--	imp.forth
+			end
 		end
 
 	get_at (i: INTEGER): STRING
@@ -121,11 +146,11 @@ feature -- Queries
 		require
 			valid_index: valid_index(i)
 		do
-			imp.go_i_th (i)
-			result:=imp.item
+			--imp.go_i_th (i)
+			result:=imp[i]
 		ensure
 			size_unchanged: imp.count= (old imp.twin).count
-			result_correct: result=imp.item
+			result_correct: result=imp[i]
 			no_elements_changed:
 			across
 				1 |..| (old imp.twin).count as j
